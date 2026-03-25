@@ -188,11 +188,11 @@ const VerificationLog = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="glass-panel p-6 md:p-8">
+      <div className="glass-panel p-6 md:p-8 border-glow animate-slideInDown">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
             <h2 className="text-2xl md:text-3xl font-bold flex items-center gap-2">
-              <BarChart3 className="w-8 h-8 text-neon-cyan" />
+              <BarChart3 className="w-8 h-8 text-neon-cyan animate-neon-flicker" />
               Verification Log
             </h2>
             <p className="text-slate-400 mt-2">
@@ -200,7 +200,7 @@ const VerificationLog = () => {
             </p>
           </div>
           <div className="text-sm text-slate-300 text-right">
-            <p className="font-semibold">{filteredItems.length}</p>
+            <p className="font-semibold text-neon-cyan">{filteredItems.length}</p>
             <p className="text-slate-500">{filteredItems.length === 1 ? 'check' : 'checks'} found</p>
           </div>
         </div>
@@ -209,19 +209,19 @@ const VerificationLog = () => {
       {/* Statistics Cards */}
       {items.length > 0 && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="glass-panel p-4">
+          <div className="glass-panel p-4 hover:border-neon-cyan/40 hover:glow-cyan transition-all animate-fadeInUp">
             <p className="text-slate-400 text-xs font-medium mb-1">Total Checks</p>
-            <p className="text-2xl font-bold">{stats.total}</p>
+            <p className="text-2xl font-bold text-neon-cyan">{stats.total}</p>
           </div>
-          <div className="glass-panel p-4">
+          <div className="glass-panel p-4 hover:border-rose-500/40 transition-all animate-fadeInUp" style={{ animationDelay: '50ms' }}>
             <p className="text-slate-400 text-xs font-medium mb-1">AI Generated</p>
             <p className="text-2xl font-bold text-rose-400">{stats.aiGenerated}</p>
           </div>
-          <div className="glass-panel p-4">
+          <div className="glass-panel p-4 hover:border-emerald-500/40 transition-all animate-fadeInUp" style={{ animationDelay: '100ms' }}>
             <p className="text-slate-400 text-xs font-medium mb-1">Authentic</p>
             <p className="text-2xl font-bold text-emerald-400">{stats.authentic}</p>
           </div>
-          <div className="glass-panel p-4">
+          <div className="glass-panel p-4 hover:border-neon-cyan/40 hover:glow-cyan transition-all animate-fadeInUp" style={{ animationDelay: '150ms' }}>
             <p className="text-slate-400 text-xs font-medium mb-1">Avg Confidence</p>
             <p className="text-2xl font-bold text-neon-blue">{stats.avgConfidence}%</p>
           </div>
@@ -411,15 +411,15 @@ const VerificationLog = () => {
                 </tr>
               </thead>
               <tbody>
-                {paginatedItems.map((item) => (
-                  <tr key={item.id} className="border-b border-dark-700/50 hover:bg-dark-800/30 transition-colors">
-                    <td className="py-3 font-medium text-slate-200 truncate">{item.fileName}</td>
+                {paginatedItems.map((item, index) => (
+                  <tr key={item.id} className="border-b border-dark-700/50 hover:bg-dark-800/50 hover:border-neon-cyan/30 transition-all animate-fadeInUp" style={{ animationDelay: `${index * 30}ms` }}>
+                    <td className="py-3 font-medium text-slate-200 truncate text-glow">{item.fileName}</td>
                     <td className="py-3">
                       <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-bold border ${statusClass(item.verdict)}`}>
                         {item.verdict}
                       </span>
                     </td>
-                    <td className="py-3 text-right font-semibold text-slate-100">
+                    <td className="py-3 text-right font-semibold text-neon-cyan">
                       {item.probability}%
                     </td>
                     <td className="py-3 text-slate-400 text-xs">{toDateTime(item.timestamp)}</td>

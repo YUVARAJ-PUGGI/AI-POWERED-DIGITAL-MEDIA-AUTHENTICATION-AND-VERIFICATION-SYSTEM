@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
   UploadCloud,
   CheckCircle,
@@ -49,9 +50,9 @@ const shortHash = (hash) => {
 };
 
 const statusClass = (status) => {
-  if (status === 'AI_GENERATED') return 'text-rose-300 bg-rose-500/20 border-rose-500/40';
-  if (status === 'AUTHENTIC') return 'text-emerald-300 bg-emerald-500/20 border-emerald-500/40';
-  return 'text-amber-300 bg-amber-500/20 border-amber-500/40';
+  if (status === 'AI_GENERATED') return 'text-accent-indigo bg-accent-indigo/20 border-accent-indigo/40';
+  if (status === 'AUTHENTIC') return 'text-accent-cyan bg-accent-cyan/20 border-accent-cyan/40';
+  return 'text-accent-blue bg-accent-blue/20 border-accent-blue/40';
 };
 
 const createImageMaps = async (file) => {
@@ -163,6 +164,8 @@ const computeSha256 = async (file) => {
 };
 
 const UploadSOP = () => {
+  const location = useLocation();
+  const cinematicEntry = Boolean(location.state && location.state.cinematic);
   const fileInputRef = useRef(null);
 
   const [step, setStep] = useState(1);
@@ -197,10 +200,10 @@ const UploadSOP = () => {
 
   const probability = toPercentDisplay(aiDetection && aiDetection.ai_probability);
   const probabilityBarClass = probability > 60
-    ? 'bg-rose-500'
+    ? 'bg-accent-indigo'
     : probability >= 40
-      ? 'bg-amber-400'
-      : 'bg-emerald-500';
+      ? 'bg-accent-blue'
+      : 'bg-accent-cyan';
 
   const verdict = String((aiDetection && aiDetection.verdict) || 'INCONCLUSIVE').toUpperCase();
   const methodLabel = aiDetection && aiDetection.method === 'ML_MODEL' ? 'ML Model' : 'Heuristic Fallback';
@@ -412,7 +415,9 @@ const UploadSOP = () => {
   }, [previewMaps]);
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
+    <div className={`relative max-w-5xl mx-auto space-y-6 ${cinematicEntry ? 'animate-cinematic-pop-enter' : ''}`}>
+      {cinematicEntry && <div className="cinematic-veil animate-cinematic-veil" />}
+
       <div className="glass-panel p-6 md:p-7">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
@@ -427,15 +432,16 @@ const UploadSOP = () => {
       </div>
 
       <div className="flex items-center justify-between mb-2 relative z-0">
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-dark-700 -z-10 rounded-full">
-          <div className="h-full bg-neon-blue rounded-full transition-all duration-500" style={{ width: `${(step - 1) * 50}%` }} />
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-dark-700 -z-10 rounded-full border border-dark-600">
+          <div className="h-full bg-gradient-to-r from-neon-cyan to-neon-blue rounded-full transition-all duration-500 shadow-lg shadow-neon-cyan/50" style={{ width: `${(step - 1) * 50}%` }} />
         </div>
         {[1, 2, 3].map((i) => (
           <div
             key={i}
-            className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${
-              step >= i ? 'bg-neon-blue text-white shadow-[0_0_15px_rgba(59,130,246,0.5)]' : 'bg-dark-800 text-slate-500 border border-dark-600'
+            className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all animate-fadeInUp ${
+              step >= i ? 'bg-gradient-to-r from-neon-cyan to-neon-blue text-white shadow-neon-glow-lg' : 'bg-dark-800 text-slate-500 border border-dark-600/50'
             }`}
+            style={{ animationDelay: `${i * 100}ms` }}
           >
             {i}
           </div>
@@ -454,9 +460,9 @@ const UploadSOP = () => {
               onDragOver={handleDragOver}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current && fileInputRef.current.click()}
-              className="border-2 border-dashed border-dark-600 hover:border-neon-blue bg-dark-900/40 rounded-2xl p-12 text-center cursor-pointer transition-all group"
+              className="border-2 border-dashed border-neon-cyan/40 hover:border-neon-cyan hover:glow-cyan bg-dark-900/40 rounded-2xl p-12 text-center cursor-pointer transition-all group animate-fadeInUp"
             >
-              <UploadCloud className="w-16 h-16 mx-auto text-slate-500 group-hover:text-neon-blue transition-colors mb-4" />
+              <UploadCloud className="w-16 h-16 mx-auto text-slate-500 group-hover:text-neon-cyan transition-colors mb-4 group-hover:animate-floatUp" />
               {file ? (
                 <div>
                   <p className="text-lg font-medium text-neon-blue">{file.name}</p>
@@ -514,18 +520,18 @@ const UploadSOP = () => {
         {step === 2 && (
           <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
             <h3 className="text-xl font-bold flex items-center space-x-2">
-              <ShieldAlert className="text-rose-500" />
+              <ShieldAlert className="text-accent-indigo" />
               <span>Step 2: Verification Checklist</span>
             </h3>
 
             <div className="space-y-4">
-              {Object.entries(checklist).map(([key, val]) => (
-                <label key={key} className="flex items-center space-x-4 p-4 bg-dark-900/40 rounded-xl border border-dark-700/50 hover:border-dark-600 cursor-pointer transition-all">
+              {Object.entries(checklist).map(([key, val], index) => (
+                <label key={key} className="flex items-center space-x-4 p-4 bg-dark-900/40 rounded-xl border border-dark-700/50 hover:border-neon-cyan/40 hover:glow-cyan cursor-pointer transition-all animate-fadeInUp" style={{ animationDelay: `${index * 50}ms` }}>
                   <input
                     type="checkbox"
                     checked={val}
                     onChange={() => setChecklist({ ...checklist, [key]: !val })}
-                    className="w-5 h-5 rounded border-dark-500 text-neon-blue focus:ring-neon-blue bg-dark-800"
+                    className="w-5 h-5 rounded border-dark-500 text-neon-cyan focus:ring-neon-cyan bg-dark-800 cursor-pointer"
                   />
                   <span className="font-medium text-slate-200">{checklistLabels[key]}</span>
                 </label>
@@ -555,7 +561,7 @@ const UploadSOP = () => {
         {step === 3 && (
           <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
             <h3 className="text-xl font-bold flex items-center space-x-2">
-              <FileText className="text-emerald-500" />
+              <FileText className="text-accent-cyan" />
               <span>Step 3: Final Review and Detection</span>
             </h3>
 
@@ -586,8 +592,8 @@ const UploadSOP = () => {
               </div>
             </div>
 
-            <div className="bg-rose-500/10 border border-rose-500/30 rounded-xl p-4 flex items-start space-x-3">
-              <CheckCircle className="text-rose-500 w-6 h-6 mt-0.5 shrink-0" />
+            <div className="bg-accent-indigo/10 border border-accent-indigo/30 rounded-xl p-4 flex items-start space-x-3">
+              <CheckCircle className="text-accent-indigo w-6 h-6 mt-0.5 shrink-0" />
               <p className="text-sm text-slate-300">
                 By submitting, you confirm this file can be processed for authenticity assessment and that the provided details are accurate to the best of your knowledge.
               </p>
@@ -606,40 +612,40 @@ const UploadSOP = () => {
             </div>
 
             {submitError && (
-              <div className="bg-rose-500/10 border border-rose-500/30 rounded-xl p-4 text-sm text-rose-200">
+              <div className="bg-accent-indigo/10 border border-accent-indigo/30 rounded-xl p-4 text-sm text-accent-indigo/80">
                 {submitError}
               </div>
             )}
 
             {aiDetection && (
               <div className="space-y-6">
-                <div className="bg-dark-900/60 p-6 rounded-xl border border-dark-700/50 space-y-4">
+                <div className="bg-dark-900/60 p-6 rounded-xl border border-neon-cyan/30 space-y-4 glow-cyan animate-slideInDown">
                   <p className="text-slate-400 text-sm">AI Generation Assessment</p>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="p-4 rounded-xl bg-dark-800/70 border border-dark-700/60">
+                    <div className="p-4 rounded-xl bg-dark-800/70 border border-dark-700/60 hover:border-neon-cyan/40 transition-all animate-fadeInUp">
                       <p className="text-xs uppercase tracking-wide text-slate-500 mb-2">AI Probability</p>
-                      <p className="text-2xl font-bold">{probability}%</p>
+                      <p className="text-2xl font-bold text-neon-cyan">{probability}%</p>
                     </div>
-                    <div className="p-4 rounded-xl bg-dark-800/70 border border-dark-700/60">
+                    <div className="p-4 rounded-xl bg-dark-800/70 border border-dark-700/60 hover:border-neon-cyan/40 transition-all animate-fadeInUp" style={{ animationDelay: '50ms' }}>
                       <p className="text-xs uppercase tracking-wide text-slate-500 mb-2">Verdict</p>
                       <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-wide border ${statusClass(verdict)}`}>
                         {verdict}
                       </span>
                     </div>
-                    <div className="p-4 rounded-xl bg-dark-800/70 border border-dark-700/60">
+                    <div className="p-4 rounded-xl bg-dark-800/70 border border-dark-700/60 hover:border-neon-cyan/40 transition-all animate-fadeInUp" style={{ animationDelay: '100ms' }}>
                       <p className="text-xs uppercase tracking-wide text-slate-500 mb-2">Confidence</p>
-                      <p className="text-2xl font-bold">{toPercentDisplay(aiDetection.confidence)}%</p>
+                      <p className="text-2xl font-bold text-neon-cyan">{toPercentDisplay(aiDetection.confidence)}%</p>
                     </div>
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-2 animate-fadeInUp" style={{ animationDelay: '150ms' }}>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-slate-300">Probability Visualization</span>
-                      <span className="font-semibold text-white">{probability}%</span>
+                      <span className="font-semibold text-neon-cyan">{probability}%</span>
                     </div>
-                    <div className="w-full h-4 rounded-full bg-dark-700 overflow-hidden">
-                      <div className={`h-full transition-all duration-500 ${probabilityBarClass}`} style={{ width: `${probability}%` }} />
+                    <div className="w-full h-4 rounded-full bg-dark-700 overflow-hidden border border-dark-600/50">
+                      <div className={`h-full transition-all duration-500 shadow-lg ${probabilityBarClass}`} style={{ width: `${probability}%`, boxShadow: probability > 60 ? '0 0 20px rgba(244, 63, 94, 0.6)' : probability >= 40 ? '0 0 20px rgba(251, 146, 60, 0.6)' : '0 0 20px rgba(16, 185, 129, 0.6)' }} />
                     </div>
                   </div>
 
@@ -709,7 +715,7 @@ const UploadSOP = () => {
                   </div>
 
                   <div className="space-y-6">
-                    <div className="bg-dark-900/60 p-5 rounded-xl border border-dark-700/50 space-y-3">
+                    <div className="bg-dark-900/60 p-5 rounded-xl border border-neon-cyan/30 space-y-3 glow-cyan animate-fadeInUp" style={{ animationDelay: '200ms' }}>
                       <h4 className="font-semibold flex items-center gap-2"><FileText className="w-4 h-4 text-neon-cyan" />Evidence Metadata</h4>
                       <div className="text-sm space-y-2">
                         <p><span className="text-slate-400">File Name:</span> {fileMeta ? fileMeta.name : 'N/A'}</p>
@@ -720,16 +726,16 @@ const UploadSOP = () => {
                       </div>
                     </div>
 
-                    <div className="bg-dark-900/60 p-5 rounded-xl border border-dark-700/50 space-y-3">
+                    <div className="bg-dark-900/60 p-5 rounded-xl border border-neon-cyan/30 space-y-3 glow-cyan animate-fadeInUp" style={{ animationDelay: '250ms' }}>
                       <h4 className="font-semibold flex items-center gap-2"><Hash className="w-4 h-4 text-neon-cyan" />Evidence Hash (SHA-256)</h4>
-                      <p className="font-mono text-xs break-all text-slate-300 bg-dark-800 p-3 rounded-lg border border-dark-700/60">{evidenceHash}</p>
+                      <p className="font-mono text-xs break-all text-slate-300 bg-dark-800 p-3 rounded-lg border border-dark-700/60 text-glow">{evidenceHash}</p>
                     </div>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div className="bg-dark-900/60 p-5 rounded-xl border border-dark-700/50 space-y-3">
-                    <h4 className="font-semibold flex items-center gap-2"><Activity className="w-4 h-4 text-neon-cyan" />System Status</h4>
+                    <div className="bg-dark-900/60 p-5 rounded-xl border border-neon-cyan/30 space-y-3 glow-cyan animate-fadeInUp" style={{ animationDelay: '300ms' }}>
+                      <h4 className="font-semibold flex items-center gap-2"><Activity className="w-4 h-4 text-neon-cyan animate-pulse" />System Status</h4>
                     <div className="text-sm space-y-2">
                       <p><span className="text-slate-400">Model Status:</span> <span className="font-semibold">{String(systemStatus.status || 'unknown').toUpperCase()}</span></p>
                       <p><span className="text-slate-400">Detector Version:</span> v1.0</p>
@@ -739,8 +745,8 @@ const UploadSOP = () => {
                     </div>
                   </div>
 
-                  <div className="bg-dark-900/60 p-5 rounded-xl border border-dark-700/50 space-y-3">
-                    <h4 className="font-semibold flex items-center gap-2"><Clock3 className="w-4 h-4 text-neon-cyan" />Case History</h4>
+                    <div className="bg-dark-900/60 p-5 rounded-xl border border-neon-cyan/30 space-y-3 glow-cyan animate-fadeInUp" style={{ animationDelay: '350ms' }}>
+                      <h4 className="font-semibold flex items-center gap-2"><Clock3 className="w-4 h-4 text-neon-cyan animate-spin-slow" />Case History</h4>
                     <div className="max-h-44 overflow-auto">
                       {historyItems.length === 0 ? (
                         <p className="text-sm text-slate-400">No recent checks yet.</p>
